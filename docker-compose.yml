@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  db:
+    image: postgres:11.0-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - foo_bar_pgdata:/var/lib/postgresql/data
+
+volumes:
+  foo_bar_pgdata:
