@@ -1,21 +1,19 @@
 # AdjustTask
 
-**TODO: Add description**
+To start your server:
 
-## Installation
+  * Install dependencies with `mix deps.get`
+  * Start `PostgreSQL 11` with docker `docker-compose up`
+  * Create and migrate your database with `mix seed`
+  * Start endpoint with `iex -S mix`
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `adjust_task` to your list of dependencies in `mix.exs`:
+Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-```elixir
-def deps do
-  [
-    {:adjust_task, "~> 0.1.0"}
-  ]
-end
-```
+Following endpoints are available
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/adjust_task](https://hexdocs.pm/adjust_task).
+  * For the source table [`./dbs/foo/tables/source`](http://localhost:4000/dbs/foo/tables/source)
+  * For the dest table [`./dbs/bar/tables/dest`](http://localhost:4000/dbs/bar/tables/dest)
 
+## Mix task for creating the databases with data
+
+  * Run `mix seed`
