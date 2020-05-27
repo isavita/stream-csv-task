@@ -5,9 +5,14 @@ defmodule AdjustTask.Application do
 
   use Application
 
+  alias AdjustTask.{Router, Seed}
+
   def start(_type, _args) do
+    Seed.create_databases!()
+    Seed.create_tables_with_data!()
+
     children = [
-      {Plug.Cowboy, scheme: :http, plug: AdjustTask.Router, options: [port: 4000]}
+      {Plug.Cowboy, scheme: :http, plug: Router, options: [port: 4000]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
