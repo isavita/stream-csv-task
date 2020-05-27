@@ -33,8 +33,15 @@ defmodule AdjustTask.Seed do
         database: "foo"
       )
 
-    Postgrex.query!(foo_pid, "CREATE TABLE IF NOT EXISTS source(a int, b int, c int)", [])
-    batch_insert_source_data(foo_pid)
+    just_created_source =
+      case Postgrex.query!(foo_pid, "CREATE TABLE IF NOT EXISTS source(a int, b int, c int)", []) do
+        %{messages: []} -> true
+        _ -> false
+      end
+
+    if just_created_source, do: batch_insert_source_data(foo_pid)
+    copy_source_to_csv_query = "COPY source TO '/tmp/source.csv' DELIMITER ',' CSV HEADER"
+    if just_created_source, do: Postgrex.query!(foo_pid, copy_source_to_csv_query, [])
 
     {:ok, bar_pid} =
       Postgrex.start_link(
@@ -44,12 +51,14 @@ defmodule AdjustTask.Seed do
         database: "bar"
       )
 
-    Postgrex.query!(bar_pid, "CREATE TABLE IF NOT EXISTS dest(a int, b int, c int)", [])
+    just_created_dest =
+      case Postgrex.query!(bar_pid, "CREATE TABLE IF NOT EXISTS dest(a int, b int, c int)", []) do
+        %{messages: []} -> true
+        _ -> false
+      end
 
-    copy_query =
-      "INSERT INTO dest SELECT * FROM dblink('dbname=foo', 'select a,b,c from source') as t1(a int, b int, c int)"
-
-    Postgrex.query!(bar_pid, copy_query, [])
+    copy_csv_to_dest_query = "COPY dest FROM '/tmp/source.csv' DELIMITER ',' CSV HEADER"
+    if just_created_dest , do: Postgrex.query!(bar_pid, copy_csv_to_dest_query, [])
 
     :ok
   end

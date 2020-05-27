@@ -8,28 +8,37 @@ defmodule AdjustTask.Router do
   alias NimbleCSV.RFC4180, as: CSV
 
   plug(Plug.Logger, log: :debug)
-
   plug(:match)
-
   plug(:dispatch)
 
   get "/dbs/foo/tables/source" do
-    conn =
-      conn
-      |> put_resp_content_type("text/csv")
-      |> put_resp_header("content-disposition", ~s[attachment; filename="source.csv"])
-      |> send_chunked(:ok)
+    conn = resp_csv_chunked(conn, "source.csv")
 
-    {:ok, foo_pid} =
-      Postgrex.start_link(
-        hostname: "localhost",
-        username: "postgres",
-        password: "postgres",
-        database: "foo"
-      )
+    {:ok, pid} = DataStore.start_link_foo()
+    stream_csv_data(conn, pid, "SELECT a, b, c FROM source")
 
-    DataStore.stream_source_data(foo_pid, "SELECT * FROM source", fn stream ->
-      columns = CSV.dump_to_iodata([["a", "b", "c"]])
+    conn
+  end
+
+  get "/dbs/bar/tables/dest" do
+    conn = resp_csv_chunked(conn, "dest.csv")
+
+    {:ok, pid} = DataStore.start_link_bar()
+    stream_csv_data(conn, pid, "SELECT a, b, c FROM dest")
+
+    conn
+  end
+
+  defp resp_csv_chunked(conn, filename) do
+    conn
+    |> put_resp_content_type("text/csv")
+    |> put_resp_header("content-disposition", ~s[attachment; filename="#{filename}"])
+    |> send_chunked(:ok)
+  end
+
+  defp stream_csv_data(conn, pid, query, headers \\ ["a", "b", "c"]) do
+    DataStore.stream_source_data(pid, query, fn stream ->
+      columns = CSV.dump_to_iodata([headers])
       chunk(conn, columns)
 
       for result <- stream do
@@ -37,15 +46,17 @@ defmodule AdjustTask.Router do
         chunk(conn, csv_row)
       end
     end)
-
-    conn
-  end
-
-  get "/dbs/bar/tables/dest" do
-    send_resp(conn, 200, "dest")
   end
 
   match _ do
-    send_resp(conn, 404, "not found")
+    body = """
+    *****************ADJUST TASK*****************
+    *The CSV data can be found at endpoints:*****
+    *http://localhost:4000/dbs/foo/tables/source*
+    *http://localhost:4000/dbs/bar/tables/dest***
+    *********************************************
+    """
+
+    send_resp(conn, 200, body)
   end
 end

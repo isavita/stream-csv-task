@@ -6,4 +6,22 @@ defmodule AdjustTask.DataStore do
       callback.(stream)
     end)
   end
+
+  def start_link_foo do
+    Postgrex.start_link(
+      hostname: "localhost",
+      username: "postgres",
+      password: "postgres",
+      database: "foo"
+    )
+  end
+
+  def start_link_bar do
+    Postgrex.start_link(
+      hostname: "localhost",
+      username: "postgres",
+      password: "postgres",
+      database: "bar"
+    )
+  end
 end
