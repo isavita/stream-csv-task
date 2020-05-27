@@ -18,7 +18,9 @@ defmodule AdjustTask.RouterTest do
     assert conn.state == :chunked
     assert conn.status == 200
     assert find_value(conn.resp_headers, "content-type") =~ "text/csv"
-    assert find_value(conn.resp_headers, "content-disposition") =~ ~s(attachment; filename="source.csv")
+
+    assert find_value(conn.resp_headers, "content-disposition") =~
+             ~s(attachment; filename="source.csv")
   end
 
   test "returns headers for stream csv when dest endpoint requested" do
@@ -27,7 +29,9 @@ defmodule AdjustTask.RouterTest do
     assert conn.state == :chunked
     assert conn.status == 200
     assert find_value(conn.resp_headers, "content-type") =~ "text/csv"
-    assert find_value(conn.resp_headers, "content-disposition") =~ ~s(attachment; filename="dest.csv")
+
+    assert find_value(conn.resp_headers, "content-disposition") =~
+             ~s(attachment; filename="dest.csv")
   end
 
   defp find_value(headers, target) do

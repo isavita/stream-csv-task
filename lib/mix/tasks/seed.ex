@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Seed do
   end
 
   defp run_app_start_task do
-    Mix.Task.run "app.start"
+    Mix.Task.run("app.start")
   end
 
   defp create_databases! do
@@ -74,7 +74,7 @@ defmodule Mix.Tasks.Seed do
       end
 
     copy_csv_to_dest_query = "COPY dest FROM '/tmp/source.csv' DELIMITER ',' CSV HEADER"
-    if just_created_dest , do: Postgrex.query!(bar_pid, copy_csv_to_dest_query, [])
+    if just_created_dest, do: Postgrex.query!(bar_pid, copy_csv_to_dest_query, [])
 
     :ok
   end
@@ -92,5 +92,4 @@ defmodule Mix.Tasks.Seed do
     |> Enum.map(fn n -> "(#{n},#{rem(n, 3)},#{rem(n, 5)})" end)
     |> Enum.join(",")
   end
-
 end

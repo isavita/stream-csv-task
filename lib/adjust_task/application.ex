@@ -6,7 +6,7 @@ defmodule AdjustTask.Application do
   use Application
 
   def start(_type, _args) do
-   children = [
+    children = [
       {Plug.Cowboy, scheme: :http, plug: AdjustTask.Router, options: [port: 4000]}
     ]
 

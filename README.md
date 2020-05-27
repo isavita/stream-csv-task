@@ -17,3 +17,10 @@ Following endpoints are available
 ## Mix task for creating the databases with data
 
   * Run `mix seed`
+
+## Design flaws/Missing elements
+
+  * The tests depend on the seed and there is not config for different mix env.
+  * The naming can be better.
+  * Istead of using tmp file with the `COPY COMMAND` using something like
+      `INSERT INTO dest (a, b, c) SELECT * FROM dblink('dbname=foo', 'select a, b, c from source') as t1(a int, b int, c int)`.
