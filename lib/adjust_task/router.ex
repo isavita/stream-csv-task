@@ -14,7 +14,7 @@ defmodule AdjustTask.Router do
   get "/dbs/foo/tables/source" do
     conn = resp_csv_chunked(conn, "source.csv")
 
-    {:ok, pid} = DataStore.start_link_foo()
+    {:ok, pid} = DataStore.start_conn("foo")
     stream_csv_data(conn, pid, "SELECT a, b, c FROM source")
 
     conn
@@ -23,7 +23,7 @@ defmodule AdjustTask.Router do
   get "/dbs/bar/tables/dest" do
     conn = resp_csv_chunked(conn, "dest.csv")
 
-    {:ok, pid} = DataStore.start_link_bar()
+    {:ok, pid} = DataStore.start_conn("bar")
     stream_csv_data(conn, pid, "SELECT a, b, c FROM dest")
 
     conn
@@ -51,7 +51,8 @@ defmodule AdjustTask.Router do
   match _ do
     body = """
     *****************ADJUST TASK*****************
-    *The CSV data can be found at endpoints:*****
+    *********MAKE SURE TO RUN 'mix seed'*********
+    ***The CSV data can be found at endpoints:***
     *http://localhost:4000/dbs/foo/tables/source*
     *http://localhost:4000/dbs/bar/tables/dest***
     *********************************************

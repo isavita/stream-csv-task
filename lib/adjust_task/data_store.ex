@@ -7,21 +7,12 @@ defmodule AdjustTask.DataStore do
     end)
   end
 
-  def start_link_foo do
+  def start_conn(database) do
     Postgrex.start_link(
       hostname: "localhost",
       username: "postgres",
       password: "postgres",
-      database: "foo"
-    )
-  end
-
-  def start_link_bar do
-    Postgrex.start_link(
-      hostname: "localhost",
-      username: "postgres",
-      password: "postgres",
-      database: "bar"
+      database: database
     )
   end
 end

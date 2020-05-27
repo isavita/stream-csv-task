@@ -1,5 +1,23 @@
-defmodule AdjustTask.Seed do
-  def create_databases! do
+defmodule Mix.Tasks.Seed do
+  @moduledoc """
+  The seed context for set up the project.
+  """
+
+  use Mix.Task
+
+  @shortdoc "Creates two databases with data"
+  def run(_) do
+    run_app_start_task()
+
+    create_databases!()
+    create_tables_with_data!()
+  end
+
+  defp run_app_start_task do
+    Mix.Task.run "app.start"
+  end
+
+  defp create_databases! do
     {:ok, pg_pid} =
       Postgrex.start_link(
         hostname: "localhost",
@@ -7,8 +25,6 @@ defmodule AdjustTask.Seed do
         password: "postgres",
         database: "postgres"
       )
-
-    Postgrex.query!(pg_pid, "CREATE EXTENSION IF NOT EXISTS dblink", [])
 
     %Postgrex.Result{rows: dbs} = Postgrex.query!(pg_pid, "SELECT datname FROM pg_database", [])
     dbs = List.flatten(dbs)
@@ -24,7 +40,7 @@ defmodule AdjustTask.Seed do
     :ok
   end
 
-  def create_tables_with_data! do
+  defp create_tables_with_data! do
     {:ok, foo_pid} =
       Postgrex.start_link(
         hostname: "localhost",
@@ -76,4 +92,5 @@ defmodule AdjustTask.Seed do
     |> Enum.map(fn n -> "(#{n},#{rem(n, 3)},#{rem(n, 5)})" end)
     |> Enum.join(",")
   end
+
 end
